@@ -40,8 +40,9 @@ The processed data images a 2D slice of the ice sheet, where many features are c
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=1.0\columnwidth]{figures/TOT_JKB2d_X16a_full.png}
-\caption[]{Example ice-penetrating radar data, from a line over the Totten ice shelf (TOT/JKB2d/X16a). This transect's data will be used throughout the report. It is $\sim$200km long, and the ice is $\sim$2.8km deep at the grounding zone.}
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_JKB2d_X16a_full.png}
+\includegraphics[width=1.0\columnwidth]{figures/TOT_JKB2d_X16a_full_small.jpg}
+\caption[]{Example ice penetrating radar data, from a line over the Totten ice shelf (TOT/JKB2d/X16a). This transect's data will be used throughout the report. It is $\sim$200km long, and the ice is $\sim$2.8km deep at the grounding zone.}
 \label{fig:example_data}
 \end{figure}
 
@@ -55,7 +56,8 @@ Over the last few decades, Don Blankenship's research group has collected airbor
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=0.65\columnwidth]{figures/all_data.png}
+%\includegraphics[width=0.65\columnwidth]{figures/all_data.png}
+\includegraphics[width=0.65\columnwidth]{figures/all_data_small.jpg}
 \caption[]{Map of Antarctica showing almost everywhere that UTIG has collected data. Black lines represent transects flown with the system described in this report.}
 \label{fig:all_data}
 \end{figure}
@@ -99,8 +101,6 @@ The broad beam pattern and strong side lobes mean that in addition to echoes dir
 \caption[]{(Left) geometry for strong point reflector to show up in the data as a hyperbola. (Right) Example hyperbola from South Pole Station}
 \label{fig:hyperbola_geometry}
 \end{figure}
-
-
 
 
 \subsection{Details of Radar Electronics}
@@ -205,7 +205,8 @@ The old radar system (grey lines in \figref{fig:all_data}) was incoherent. Addin
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=1.0\columnwidth]{figures/TOT_pik1_labeled.jpg}
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_pik1_labeled.jpg}
+\includegraphics[width=1.0\columnwidth]{figures/TOT_pik1_labeled_small.jpg}
 \caption[]{Example \textbf{pik1} data product. The numbered boxes and vertical line show regions that are used to highlight the effects of different processing steps.}
 \label{fig:pik1}
 \end{figure}
@@ -273,9 +274,13 @@ $chirp \ast trace = iFFT(FFT(trace) \cdot FFT(chirp))$
 
 \begin{figure}[h]
 \centering
-\includegraphics[width=1.0\columnwidth]{figures/TOT_raw_full.jpg} \\
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_raw_full.jpg} \\
+\includegraphics[width=1.0\columnwidth]{figures/TOT_raw_full_small.jpg} \\
+% png is smaller, but really ugly.
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_raw_full.png} \\
 \vspace{2pt}
-\includegraphics[width=1.0\columnwidth]{figures/TOT_dechirped_full.jpg}
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_dechirped_full.jpg}
+\includegraphics[width=1.0\columnwidth]{figures/TOT_dechirped_full_small.jpg}
 \caption[]{Pulse compression sharpens interfaces. (Top) Magnitude of raw radar returns. (Bottom) After dechirping.}
 \label{fig:raw_radar}
 \end{figure}
@@ -295,7 +300,7 @@ Additionally, the reference chirp must be flipped to sweep from high to low freq
 \begin{figure}[h!]
 \centering
 \includegraphics[width=1.0\columnwidth]{figures/filter_frequencies.png}
-\caption[]{Frequency-space representation of the filter (red) and other signals in the system. FFT of Local Oscillator (70MHz) and LO's first harmonic (140MHz) are in blue. Ideal chirp frequency spectrum is light grey, 3200-bin FFT of 50MHz sampled ideal chirp in dark grey, and FFT of the chirp used in processing is black.}
+\caption[]{Frequency space representation of the filter (red) and other signals in the system. FFT of Local Oscillator (70MHz) and LO's first harmonic (140MHz) are in blue. Ideal chirp frequency spectrum is light grey, 3200-bin FFT of 50MHz sampled ideal chirp in dark grey, and FFT of the chirp used in processing is black.}
 \label{fig:filter_freqs}
 \end{figure}
 
@@ -528,17 +533,23 @@ The phases vary between transects, and we have thousands of transects, so implem
 \begin{figure}[]
 \centering
 \vspace{-30pt}
-\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_old.png}
-\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_new.png} \\
+%\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_old.png}
+%\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_new.png} \\
+\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_old.jpg}
+\includegraphics[width=0.495\columnwidth]{figures/TOT_X14d_new.jpg} \\
 \vspace{2pt}
 \includegraphics[width=0.495\columnwidth]{figures/TOT_X16a_old.jpg}
 \includegraphics[width=0.495\columnwidth]{figures/TOT_X16a_new.jpg} \\
 \vspace{2pt}
-\includegraphics[width=0.495\columnwidth]{figures/THW_old.png}
-\includegraphics[width=0.495\columnwidth]{figures/THW_new.png} \\
+%\includegraphics[width=0.495\columnwidth]{figures/THW_old.png}
+%\includegraphics[width=0.495\columnwidth]{figures/THW_new.png} \\
+\includegraphics[width=0.495\columnwidth]{figures/THW_old.jpg}
+\includegraphics[width=0.495\columnwidth]{figures/THW_new.jpg} \\
 \vspace{2pt}
-\includegraphics[width=0.495\columnwidth]{figures/VCD_old.png}
-\includegraphics[width=0.495\columnwidth]{figures/VCD_new.png}
+%\includegraphics[width=0.495\columnwidth]{figures/VCD_old.png}
+%\includegraphics[width=0.495\columnwidth]{figures/VCD_new.png}
+\includegraphics[width=0.495\columnwidth]{figures/VCD_old.jpg}
+\includegraphics[width=0.495\columnwidth]{figures/VCD_new.jpg}
 \caption[]{Demonstration of \textbf{pik1} improvements showing old (left column) and new (right column) approaches to LO correction for transects significantly affected by LO noise.}
 \label{fig:LO_results}
 \end{figure}
@@ -555,7 +566,8 @@ The elimination of the vertical stripes has made it possible to identify what we
 
 \begin{figure}[ht!]
 \centering
-\includegraphics[width=1.0\columnwidth]{figures/TOT_multiples.jpg}
+%\includegraphics[width=1.0\columnwidth]{figures/TOT_multiples.jpg}
+\includegraphics[width=1.0\columnwidth]{figures/TOT_multiples_small.jpg}
 \caption[]{Image showing surface (two round trips between plane and ice surface) and basal (two round trips between air/ice and ice/water interfaces) multiples under an ice shelf.}
 \label{fig:multiples}
 \end{figure}
