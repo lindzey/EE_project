@@ -11,11 +11,11 @@
 \usepackage[usenames,dvipsnames]{color}
 \usepackage{xifthen}
 \newboolean{include-todos}
-\setboolean{include-todos}{true}
+\setboolean{include-todos}{false}
 \newboolean{include-future}
 \setboolean{include-future}{false}
 \newboolean{include-questions}
-\setboolean{include-questions}{true}
+\setboolean{include-questions}{false}
 
 
 \newcommand{\todo}[1]{\ifthenelse{\boolean{include-todos}} {\textcolor{Red}{\textbf{TODO: #1}}}{}}
@@ -105,15 +105,16 @@ The broad beam pattern and strong side lobes mean that in addition to echoes dir
 
 \subsection{Details of Radar Electronics}
   
-\begin{figure}[h]
-\centering
-\includegraphics[width=0.4\columnwidth]{figures/GNG_block_diagram.pdf}
-\includegraphics[width=0.5\columnwidth]{figures/GNG_block_diagram2.pdf}
-\caption[]{Block diagram of radar electronics. (Credit: Gregory Ng) \todo{Better one w/ LO and only one T/R switch?}}
-\end{figure}
+\future{Better block diagram of the electronics}
+%\begin{figure}[h]
+%\centering
+%\includegraphics[width=0.4\columnwidth]{figures/GNG_block_diagram.pdf}
+%\includegraphics[width=0.5\columnwidth]{figures/GNG_block_diagram2.pdf}
+%\caption[]{Block diagram of radar electronics. (Credit: Gregory Ng) \todo{Better one w/ LO and only one T/R switch?}}
+%\end{figure}
 
-\todo{More hardware details/specs for the PXI components and amplifier?}
-The transmitted energy is a 1$\mu$s wide chirped pulse, with a 60MHz center frequency and 15MHz bandwidth. It is generated digitally with samples at 200MHz, and fed into an 8kW Tomco amplifier. \figref{fig:chirp} shows the resulting pulse shape. The pulse repetition frequency of the current system is 6250Hz, which means if the airplane is flying at the nominal 90m/s, it is taking a measurement about every 1.5cm along track. \todo{ADC?}
+\future{More hardware details/specs for the PXI components and amplifier?}
+The transmitted energy is a 1$\mu$s wide chirped pulse, with a 60MHz center frequency and 15MHz bandwidth. It is generated digitally by a PXI controller with samples at 200MHz, and fed into an 8kW Tomco amplifier. \figref{fig:chirp} shows the resulting transmitted pulse shape. The pulse repetition frequency of the current system is 6250Hz, which means if the airplane is flying at the nominal 90m/s, it is taking a measurement about every 1.5cm along track. \question{ADC?}
 
 \begin{figure}[ht!]
 \centering
@@ -122,40 +123,52 @@ The transmitted energy is a 1$\mu$s wide chirped pulse, with a 60MHz center freq
 \label{fig:chirp}
 \end{figure}
 
-From the amplifier, the signal is fed into a transmit/receive (T/R) switch and out to the antennas. \todo{more details?....}
+As discussed in \secref{sec:beam_pattern}, we use both antennas for both transmit and receive. This is enabled by routing the amplifier's output signal through a transmit/receive (T/R) switch, a splitter/combiner, and out to the antennas. \question{more details?....}
 
-Before digitization, the return signal must be down converted. \todo{Why was this necessary / why couldn't they do bandpass sampling?} \question{Is downconversion before or after. }
+For the system described in this report, the returned signal was downconverted before digitization. Recent improvements in digitizers has enabled us to do bandpass sampling without the downconversion. The downconversion is performed by mixing the signal with a 70MHz local oscillator, then low pass filtering the output. 
 
-In order to achieve a 130dB dynamic range, the returned signal is split into high and low gain channels, with \todo{???} and \todo{??} dB of amplification respectively. \todo{More digitizer specs? Is this where I describe the conversion from counts to dB input power?}
+The PXI also generates a blanking signal that brackets the outgoing chirp. The receive electronics use this to determine whether to digitize the output of the T/R switches or the attenuated reference chirp from the amplifiers.
+
+In order to achieve a 130dB dynamic range with only 14 digitizer bits, the returned signal is split into high and low gain channels. \future{ with \todo{???} and \todo{??} dB of amplification respectively.} Each channel is recorded separately; the low gain one does not saturate at the surface, so it is used for any near-surface applications, while the high gain one is used for detecting deeper layers and faint bed returns.
 
 Before writing the data to disk, 32 consecutive traces are summed. This is required to maintain a feasible disk write rate, and the justification is the same as for software stacking in \secref{sec:coherent_stacking}. The 3 least significant bits are dropped, resulting in 2 bytes per sample.
  
- % This figure is 7-8MB total ... need to decrease that or cut it out!
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.3\columnwidth]{figures/DSC03651_small.jpg}
-\includegraphics[width=0.3\columnwidth]{figures/DSC03649_small.jpg}
-\includegraphics[width=0.38\columnwidth]{figures/JKB_racks.jpg}
-\caption[]{(Left and Center) The electronics racks (Right) UTIG engineer Gregory Ng monitoring the radar performance during a survey flight. \todo{Better labeling of components.}}
-\end{figure}
-
-I need to figure out:
-\begin{itemize}
-\item exact sequence in digitizer samples of chirp and blanking signal start/end.
-\item PRF? It varied ...
-\item one or two T/R switches for JKB2h?
-\item one or two LO mixers (before/after channel split) for JKB2h?
-\item actual attenuation/amplification in receiver for high and low gain channels?
-\end{itemize}
+% % This figure is 7-8MB total ... need to decrease that or cut it out!
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=0.3\columnwidth]{figures/DSC03651_small.jpg}
+%\includegraphics[width=0.3\columnwidth]{figures/DSC03649_small.jpg}
+%\includegraphics[width=0.38\columnwidth]{figures/JKB_racks.jpg}
+%\caption[]{(Left and Center) The electronics racks (Right) UTIG engineer Gregory Ng monitoring the radar performance during a survey flight. \todo{Better labeling of components.}}
+%\end{figure}
 
 The receiver electronics saturate at 1V peak-to-peak and write 16bits to disk (14-bit digitizer, with 32x hardware stacking and dropping the 3 least significant bits before writing to disk).
-In order to to convert from counts to power or voltage we need: \\
+In order to to convert from counts to power or voltage we use: 
+
+\begin{centering}
 $2^{16}$ counts = 1.0$V_{pp}$ \\
 $V_{rms} = \frac{1}{2\sqrt{2}}V_{pp}$ \\
 0dBm = $10 \log_{10} 1mW$ \\
-Power (W) = $\frac{V_{rms}^2}{Z}$  (our system's impedance is $50\Omega$) \\
+Power (W) = $\frac{V_{rms}^2}{Z}$ \\
+\end{centering}
 
-Thus, if a signal is $C$ counts peak-to-peak in the raw data it is
+\future{Figure out how to format this w/ the = aligned.}
+%\begin{array}
+%%| c | c | \\
+%$2^{16}$ counts &= 1.0$V_{pp}$ \\
+%$V_{rms}$ &= $\frac{1}{2\sqrt{2}}V_{pp}$ \\
+%0dBm &= $10 \log_{10} 1mW$ \\
+%Power (W) &= $\frac{V_{rms}^2}{Z}$ \\
+%\end{array}
+
+%\begin{equation}
+%2^{16} counts = 1.0V_{pp}, 
+%V_{rms} = \frac{1}{2\sqrt{2}}V_{pp}, 
+%0dBm = 10 \log_{10} 1mW, 
+%Power (W) = \frac{V_{rms}^2}{Z} 
+%\end{equation}
+
+For a system with $50\Omega$) impedance, if a signal is $C$ counts peak-to-peak in the raw data it is
 $10 \log_{10} \left(1000\frac{\left(\frac{1}{2\sqrt2}\frac{C}{2^{16}}\right)^2}{50\Omega}\right)$ dBm.
 
 
@@ -170,15 +183,22 @@ In the context of radar, we use \emph{coherent} to mean a number of slightly dif
 \item To describe whether the processing applied to the data has preserved phase information. Early steps in our processing pipeline retain phase information, and later ones operate only on amplitudes. Reducing different types of noise require coherent or incoherent techniques. The ordering is important since once you've discarded phase information you can't get it back.
 \end{enumerate}
     
-The old radar system (grey lines in \figref{fig:all_data}) was incoherent. Adding the ability to recover the signal's phase allows us to use a chirped signal and perform focusing. 
+The old radar system (grey lines in \figref{fig:all_data}) was incoherent. Adding the ability to recover the signal's phase allows us to use a chirped signal for pulse compression and perform focusing. 
 
-\subsection{Chirped Signal}
-
-\todo{Brief explanation of why we transmit a chirp rather than a constant-frequency envelope? (This is where I can cite Curlander's Ch. 3 "Matched Filters")}
-
-Our transmitted 1$\mu$s wide pulse winds up with 80ns 3dB width\cite{Peters2007}.
-
-\question{Why is this hard/why didn't it get implemented until 2001? We talk about digitization/sampling rate/coherence as being the driving thing in being able to implement pulse compression. However, MUCH higher frequency applications rely on pulse compression (e.g. cell phones). How do they implement it? Is it done in analog somehow? Would this have been possible back in the day for IPR?}
+%\subsection{Chirped Signal}
+%
+%Early ice penetrating radar systems transmitted a constant frequency pulse of energy. This meant that for a given maximum amplifier power, there was a direct tradeoff between detectability and resolution, since both were governed by the total pulse width. The longer the pulse, the more ice it could penetrate, but the lower its resolution.
+%This tradeoff was eliminated by the introduction of \todo{finish this ...}
+%
+%\todo{Brief explanation of why we transmit a chirp rather than a constant-frequency envelope? (This is where I can cite Curlander's Ch. 3 "Matched Filters")}
+%
+%Our transmitted 1$\mu$s wide pulse winds up with a 3dB width of 80ns and the first nulls at 200ns\cite{Peters2007}.
+%
+%\question{What led to the decision to transmit a chirp, rather than some other waveform? Could we get improved characteristics by doing something else?}
+%
+%\question{What governs the bandwidth of the chirp? The antennas being designed }
+%
+%\question{Why is this hard/why didn't it get implemented until 2001? We talk about digitization/sampling rate/coherence as being the driving thing in being able to implement pulse compression. However, MUCH higher frequency applications rely on pulse compression (e.g. cell phones). How do they implement it? Is it done in analog somehow? Would this have been possible back in the day for IPR?}
 
 \section{The \textbf{pik1} Data Product}
 \label{sec:pik1}
@@ -243,12 +263,13 @@ This simply requires convolving a reference chirp with each received trace, and 
 In practice, this is done more efficiently using the convolution property of the Fourier Transform: 
 $chirp \ast trace = iFFT(FFT(trace) \cdot FFT(chirp))$
 
-\begin{figure}[ht!]
-\centering
-\includegraphics[width=0.2\columnwidth]{figures/placeholder.jpg}
-\caption[]{Reference chirp used in pulse compression.}
-\label{fig:ref_chirp}
-\end{figure}
+\future{Reference chirp figure!}
+%\begin{figure}[ht!]
+%\centering
+%\includegraphics[width=0.2\columnwidth]{figures/placeholder.jpg}
+%\caption[]{Reference chirp used in pulse compression.}
+%\label{fig:ref_chirp}
+%\end{figure}
 
 \begin{figure}[h]
 \centering
@@ -260,9 +281,9 @@ $chirp \ast trace = iFFT(FFT(trace) \cdot FFT(chirp))$
 \end{figure}
 
 
-Examination of \figref{fig:trace} shows that the first sample of the raw data has to be offset by 66 traces in order for it to line up with the final \textbf{pik1} data product. \todo{generate exact number.} 
-This is due to the fact that the reference chirp used in the pulse compression, shown in \figref{fig:ref_chirp}, does not start at the first sample. 
-Thus, the peak energy when convolving the reference chirp with a theoretical chirp that starts at sample 0 occurs at sample \todo{???}.\todo{This needs a better explanation...something to do about the peak energy being delayed by ??? (I should be able to derive it exactly.}
+Examination of \figref{fig:trace} shows that the first sample of the raw data has to be offset by 66 traces in order for it to line up with the final \textbf{pik1} data product. \future{generate exact number.} 
+This is due to the fact that the reference chirp used in the pulse compression \future{, shown in \figref{fig:ref_chirp},}does not start at the first sample. 
+Thus, the peak energy when convolving the reference chirp with a theoretical chirp that starts at sample 0 occurs at a later sample.\future{This needs a better explanation...something to do about the peak energy being delayed by ??? (I should be able to derive it exactly.}
 \future{While I'm working on that, I should also figure out how to explain the appearance of noise in the first 50-ish samples of the pik1 trace, and why the output trace isn't perfectly zeroed by the software blanking.}
 
 Additionally, the reference chirp must be flipped to sweep from high to low frequency. This is because the down conversion changes the signal to 70MHz - chirp, and for a 52.5~$\rightarrow$~67.5MHz chirp, this results in a 17.5~$\rightarrow$~2.5MHz signal. 
@@ -275,11 +296,13 @@ Additionally, the reference chirp must be flipped to sweep from high to low freq
 \centering
 \includegraphics[width=1.0\columnwidth]{figures/filter_frequencies.png}
 \caption[]{Frequency-space representation of the filter (red) and other signals in the system. FFT of Local Oscillator (70MHz) and LO's first harmonic (140MHz) are in blue. Ideal chirp frequency spectrum is light grey, 3200-bin FFT of 50MHz sampled ideal chirp in dark grey, and FFT of the chirp used in processing is black.}
+\label{fig:filter_freqs}
 \end{figure}
 
+As part of the pulse compression step, we apply a window function (\figref{fig:filter_freqs}) to the trace's FFT. This has the effect of further sharpening interfaces (\figref{fig:filtered}). 
 
-\todo{Check that I have the "ideal" FFT correct. Is it mirrored or not?}
-\todo{See whether mirroring the hanning filter has any effect either ...}
+%\todo{Check that I have the "ideal" FFT correct. Is it mirrored or not?}
+%\todo{See whether mirroring the hanning filter has any effect either ...}
 
 
 \begin{figure}[h!]
@@ -288,9 +311,10 @@ Additionally, the reference chirp must be flipped to sweep from high to low freq
 \vspace{2pt}
 \includegraphics[width=1.0\columnwidth]{figures/TOT_filtered_zoom1.jpg}
 \caption[]{Zooming in on the surface shows the effect of filtering. This region is box \#2 in \figref{fig:pik1}. (Top) Dechirped. (Bottom) Dechirped and filtered.}
+\label{fig:filtered}
 \end{figure}
 
-\todo{I think the reason we need this is that as the range to the surface changes slightly the peak value of the convolution changes, so we need to average it out a bit? Or is it something to do with inaccuracies introduced by having to do a discrete Fourier transform rather than the continuous-time FT? I'm not sure ... I wish that I could read that chapter that Prof. Vikalo pointed out to me ...}
+\question{I think the reason we need this is that as the range to the surface changes slightly the peak value of the convolution changes, so we need to average it out a bit? Or is it something to do with inaccuracies introduced by having to do a discrete Fourier transform rather than the continuous-time FT? I'm not sure ... I wish that I could read that chapter that Prof. Vikalo pointed out to me ...}
 
 
 \subsection{Coherent Stacking}
@@ -561,7 +585,7 @@ The temperature of an ice shelf is interesting because it will give us informati
 
 While I have spent significant time looking into the \textbf{pik1} data product, I still have some questions that I'd like to investigate further:
 \begin{itemize}
-\item Why do we use the reference chirp that we use, and where did it come from? It doesn't match the theoretical chirp or the reference recorded from the amplifier's output. \todo{Is this true? I haven't actually plotted the recorded reference chirp.} The goal is to match the output pulse shape as transmitted from the antennas, but we are not able to directly measure that. In the past, Duncan Young has attempted to use the received signal from sea water (since it is a fantastic reflector), but he says that it wound up being a good sea water detector but not good for other applications.
+\item Why do we use the reference chirp that we use, and where did it come from? It doesn't match the theoretical chirp or the reference recorded from the amplifier's output. \future{Is this true? I haven't actually plotted the recorded reference chirp.} The goal is to match the output pulse shape as transmitted from the antennas, but we are not able to directly measure that. In the past, Duncan Young has attempted to use the received signal from sea water (since it is a fantastic reflector), but he says that it wound up being a good sea water detector but not good for other applications.
 \item I'd like to dig into the high gain channel DC noise as discussed in \secref{sec:blanking}.
 \item \secref{sec:filtering} visualized the effects of filtering as currently implemented, but I still don't properly understand why that's the right thing to do in this application.
 \item I would like to perform a quantitative analysis of which stacking depth is ideal, since at this point all I have is the qualitative fact that the \textbf{pik1} product is an improvement over no stacking. This is the investigation that's least likely to make it into my group's released data products due to an issue with data consistency. We could change the balance between incoherent and coherent, but all of our final data products have the same horizontal resolution, corresponding to a total stack depth of 50x. \future{Maybe I should also do a figure showing different stacking depth choices on the image, in addition to the planned single-trace noise floor one?}
